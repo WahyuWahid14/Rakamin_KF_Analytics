@@ -1,0 +1,31 @@
+============================= FINAL QUERY IN GOOGLE BIGQUERY ================================
+
+
+QUERY:
+
+CREATE TABLE kimia_farma.kf_result AS
+SELECT
+    kf_final_transaction.customer_name,
+    kf_final_transaction.product_id,
+    kf_product.product_name,
+    kf_final_transaction.price,
+    kf_final_transaction.discount_percentage, 
+    CONCAT(
+        CASE 
+            WHEN kf_final_transaction.price <= 50000 THEN '10%'
+            WHEN kf_final_transaction.price > 50000 AND kf_final_transaction.price <= 100000 THEN '15%'
+            WHEN kf_final_transaction.price > 100000 AND kf_final_transaction.price <= 300000 THEN '20%'
+            WHEN kf_final_transaction.price > 300000 AND kf_final_transaction.price <= 500000 THEN '25%'
+            ELSE '30%'
+        END
+    ) AS persentase_gross_laba,
+    kf_final_transaction.price - (kf_final_transaction.price * discount_percentage) AS net_sales,
+    kf_final_transaction.rating AS rating_transaction,
+    kf_kantor_cabang.rating AS rating_cabang
+FROM
+    kimia_farma.kf_final_transaction
+JOIN
+    kimia_farma.kf_product ON kf_final_transaction.product_id = kf_product.product_id
+JOIN
+    kimia_farma.kf_kantor_cabang ON kf_final_transaction.branch_id = kf_kantor_cabang.branch_id;
+
